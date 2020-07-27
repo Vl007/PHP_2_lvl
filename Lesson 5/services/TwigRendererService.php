@@ -28,7 +28,7 @@ class TwigRendererService implements IRenderer
     public function render($template, $params = [])
     {
         $template = $template . '.twig';
-        $loader = new FilesystemLoader('../views/');
+        $loader = new FilesystemLoader('../views');
         $this->getTwig($loader, $params);
         return $this->twig->render($template, $params);
     }

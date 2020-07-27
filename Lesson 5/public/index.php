@@ -8,7 +8,7 @@ use App\models\User;
 use App\services\RendererTmplService;
 use App\services\TwigRendererService;
 
-require_once dirname(__DIR__) . '../vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 
 $controller = 'user';

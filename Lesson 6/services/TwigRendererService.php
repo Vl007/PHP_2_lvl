@@ -5,6 +5,7 @@ namespace App\services;
 
 
 use Twig\Environment;
+use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
 class TwigRendererService implements IRenderer
@@ -14,32 +15,38 @@ class TwigRendererService implements IRenderer
      */
     protected $twig;
 
-//    /**
-//     * TwigRendererService constructor.
-//     * @param \Twig\Environment $twig
-//     */
-//    public function __construct(\Twig\Environment $twig)
-//    {
-//        $this->twig = new Environment();
-//    }
 
+    /**
+     * TwigRendererService constructor.
+     */
+    public function __construct()
+    {
+        $loader = new FilesystemLoader([
+            dirname(__DIR__) . '/views',
+            dirname(__DIR__) . '/views/layouts',
+        ]);
+        $this->twig = new Environment(
+            $loader,
+            [
+                'debug' => true
+            ]
+        );
+        $this->twig->addExtension(new DebugExtension());
+    }
 
-
+    /**
+     * @param $template
+     * @param array $params
+     * @return string
+     */
     public function render($template, $params = [])
     {
-        $template = $template . '.twig';
-        $loader = new FilesystemLoader('../views');
-        $this->getTwig($loader, $params);
-        return $this->twig->render($template, $params);
+        $template .= '.twig';
+        try {
+            return $this->twig->render($template, $params);
+        } catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+
     }
-
-
-
-
-    protected function getTwig($loader, $params)
-    {
-        $this->twig = new Environment($loader, $params);
-    }
-
-
 }

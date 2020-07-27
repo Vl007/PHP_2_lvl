@@ -4,10 +4,13 @@
 namespace App\controllers;
 
 
-use App\models\Comments;
-use App\models\Good;
+use App\entities\Comments;
+use App\entities\Good;
+use App\repositories\CommentsRepository;
+use App\repositories\GoodRepository;
+use App\services\GoodService;
 use App\services\PaginatorService;
-use App\traits\TShop;
+use App\services\Request;
 
 class ShopController extends Controller
 {
@@ -16,9 +19,8 @@ class ShopController extends Controller
 
     public function allAction()
     {
-        $paginator = new PaginatorService('?c=shop');
-        $goods = new Good();
-        $paginator->setItems($goods, $this->getPage());
+        $paginator = new PaginatorService(new GoodRepository(),'/shop');
+        $paginator->setItems($this->getPage());
             return $this->render('goods',
                 [
                     'paginator' => $paginator,
@@ -31,41 +33,41 @@ class ShopController extends Controller
     {
         $id = $this->getId();
         $article = $this->getArticle();
-        return $this->render('good',
+        $res = (new GoodRepository())->getOne($id);
+        if ($res) {
+            return $this->render('good',
+                [
+                    'good' => $res,
+                    'comments' => (new CommentsRepository())->getComments($article)
+                ]);
+        }
+        return $this->render('errorpage',
             [
-                'good' => Good::getOne($id),
-                'comments' => Comments::getComments($article)
+                'msg' => 'Товар не найден'
             ]);
+
 
     }
 
     public function addCommentAction()
     {
-        $id = (int)$this->getId();
+        $id = $this->getId();
         $article = $this->getArticle();
         $goodForCom = new Comments();
         $goodForCom->article = $article;
         $goodForCom->comment = $_POST['commit'];
-        $goodForCom->save();
-        header("Location: ?c=shop&a=one&id={$id}&article={$article}");
+        (new CommentsRepository())->save($goodForCom);
+        header("Location: /shop/one/?id={$id}&article={$article}");
     }
 
     public function editInfoAction()
     {
         $id = (int)$this->getId();
         $article = $this->getArticle();
-        $goodForEdit = new Good();
-        if (!empty($_POST['article'])) {
-            $article = $_POST['article'];
-        }
-        foreach ($_POST as $key => $value) {
-            if (!empty($value)) {
-                $goodForEdit->$key = $value;
-            }
-        }
-        $goodForEdit->id = $id;
-        $goodForEdit->save();
-        header("Location: ?c=shop&a=one&id={$id}&article={$article}");
+        $arrFromPost = $this->request->post();
+        (new GoodService())->save($id, $arrFromPost);
+        header("Location: /shop/one/?id={$id}&article={$article}");
+        return;
     }
 
 
@@ -78,25 +80,29 @@ class ShopController extends Controller
                     'msg' => $msg
                 ]);
         }
-        $goodForEdit = new Good();
-        $goodForEdit->name = $_POST['name'];
-        $goodForEdit->price = $_POST['price'];
-        $goodForEdit->description = $_POST['description'];
-        $goodForEdit->img = $_POST['img'];
-        $goodForEdit->article = $_POST['article'];
-        $res = $goodForEdit->save();
-        if ($res->rowCount() > 0) {
-            $msg = 'Товар успешно добавлен в БД';
-        } else {
-            $msg = 'Товар не добавлен в БД. Необходимо обязательно Name и Price';
+        $id = (int)$this->getId();
+        $arrFromPost = $this->request->post();
+        $res = (new GoodService())->save($id, $arrFromPost);
+
+        if (!$res){
+            return $this->render('addgoodpage',
+                [
+                    'msg' => 'Товар не добавлен в БД. Необходимо обязательно Name и Price',
+                    'data' => $arrFromPost
+                ]);
         }
-
-
-        return $this->render('addgoodpage',
+        return $this->render('errorpage',
             [
-                'msg' => $msg
+                'msg' => 'Товар успешно добавлен в БД'
             ]);
     }
-
+    public function delAction()
+    {
+        $id = $this->getId();
+        /** @var Good $good */
+//        $good = (new GoodRepository())->getOne($id);
+        (new GoodRepository())->delete($id);
+        header("Location: /");
+    }
 
 }

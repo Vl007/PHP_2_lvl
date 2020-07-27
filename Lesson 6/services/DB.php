@@ -74,14 +74,11 @@ class DB {
 		return $PDOStatement->fetchAll();
 	}
 
-	public function find( $sql, $params = [] ) {
-		$res = $this->query( $sql, $params );
-		if ( $res->rowCount() > 0 ) {
-			return $res->fetch();
-		}
 
-		return 'Товар не найден';
-	}
+    public function find($sql, $params = [])
+    {
+        return $this->query($sql, $params)->fetch();
+    }
 
 	public function findAll( $sql, $params = [] ) {
 //		return $this->query( $sql, $params )->fetchAll(PDO::FETCH_CLASS, Good::class);

@@ -6,6 +6,7 @@ namespace App\controllers;
 
 use App\services\IRenderer;
 use App\services\RendererTmplService;
+use App\services\Request;
 use App\services\TwigRendererService;
 
 abstract class Controller
@@ -13,14 +14,17 @@ abstract class Controller
     private $action;
     protected $actionDefault = 'all';
     protected $renderer;
+    protected $request;
 
     /**
      * Controller constructor.
-     * @param $renderer
+     * @param IRenderer $renderer
+     * @param Request $request
      */
-    public function __construct(IRenderer $renderer)
+    public function __construct(IRenderer $renderer, Request $request)
     {
         $this->renderer = $renderer;
+        $this->request = $request;
     }
 
 
@@ -40,29 +44,17 @@ abstract class Controller
     }
     protected function getId()
     {
-        $id = 0;
-        if(!empty((int)$_GET['id'])){
-            $id = (int)$_GET['id'];
-        }
-        return $id;
+        return $this->request->getGet('id');
     }
 
     protected function getArticle()
     {
-        $article = '';
-        if(!empty($_GET['article'])){
-            $article = $_GET['article'];
-        }
-        return $article;
+        return $this->request->getGet('article');
     }
 
     protected function getPage()
     {
-        $page = 1;
-        if(!empty($_GET['page'])){
-            $page = $_GET['page'];
-        }
-        return $page;
+        return $this->request->getGet('page');
     }
 
     public function render($template, $params = [])

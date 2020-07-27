@@ -4,7 +4,9 @@
 namespace App\services;
 
 
-use App\models\Model;
+use App\entities\Entity;
+use App\repositories\GoodRepository;
+use App\repositories\Repository;
 
 class PaginatorService
 {
@@ -12,22 +14,27 @@ class PaginatorService
     protected $count = 0;
     protected $perPage = 10;
     protected $baseRote;
+    protected $RepoName;
 
     /**
      * PaginatorService constructor.
+     * @param $nameRepo
      * @param $baseRote
      */
-    public function __construct($baseRote)
+    public function __construct(Repository $nameRepo , $baseRote)
     {
         $this->baseRote = $baseRote;
+        $this->RepoName = $nameRepo;
     }
 
-
-    public function setItems(Model $model , $pageNumber = 1)
+    /**
+     * @param int $pageNumber
+     */
+    public function setItems( $pageNumber = 1)
     {
-        $countData = $model->getCountList();
+        $countData = $this->RepoName->getCountList();
         $this->count = $countData['count'];
-        $this->items = $model->getWithPage($pageNumber, $this->perPage);
+        $this->items = $this->RepoName->getWithPage($pageNumber, $this->perPage);
     }
 
     public function getItems(): array
@@ -47,7 +54,7 @@ class PaginatorService
         }
         for ($i = 1; $i <= $linkPages; $i++){
             if ($i > 1){
-                $urls[$i] = $this->baseRote . '&page=' . $i;
+                $urls[$i] = $this->baseRote . '/?page=' . $i;
             }else {
                 $urls[$i] = $this->baseRote;
             }

@@ -45,21 +45,21 @@
                 <p>{{ good.price }}$</p>
                 <div class="cart__product-param quantity">
                     <div class="cart__product-quantity">
-                        <a href="/basket/del/?id={{ good.id }}&article={{ good.article }}"><button><i class="fas fa-minus-circle"></i></button></a>
+                        <a href="/?basket/del/?id={{ good.id }}&article={{ good.article }}"><button><i class="fas fa-minus-circle"></i></button></a>
                         <h5>{{ good.count }}</h5>
-                        <a href="/basket/add/?id={{ good.id }}&article={{ good.article }}"><button><i class="fas fa-plus-circle"></i></button></a>
+                        <a href="/?basket/add/?id={{ good.id }}&article={{ good.article }}"><button><i class="fas fa-plus-circle"></i></button></a>
                     </div>
                 </div>
                 <p>FREE</p>
                 <p>${{ good.price * good.count}}</p>
-                <a href="/basket/remove/?&article={{ good.article }}"><i class="fas fa-times-circle"></i></a>
+                <a href="/?basket/remove/?&article={{ good.article }}"><i class="fas fa-times-circle"></i></a>
             </div>
         </div>
         {% endfor %}
 
     </div>
     <div class="product__details__buttons">
-        <a href="/basket/clearCart/">cLEAR SHOPPING CART</a>
+        <a href="/?basket/clearCart/">cLEAR SHOPPING CART</a>
         <a href="#">cONTINUE sHOPPING</a>
     </div>
         {% if isSignIn %}
